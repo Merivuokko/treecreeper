@@ -1,0 +1,11 @@
+- DECL_QUALIFIER for QUAL_UNION
+- DECL_USER_ALIGN
+- INTEGER_TYPE: TREE_TYPE is the super-integer-type in Pascal at least
+- What is machine mode?
+- ??? What is TREE_OVERFLOW for int_cst
+- The DECL_ALIGN, DECL_SIZE, and DECL_MODE fields exist in decl nodes just as in type nodes. They are unused in LABEL_DECL, TYPE_DECL and CONST_DECL nodes.
+- DECL_INITIAL holds the value to initialize a variable to
+- FIX??? What is DECL_ARG_TYPE
+- TREE_READONLY TREE_THIS_VOLATILE DECL_UNSIGNED(field_decl), TREE_USED, TREE_DEPRECATED
+- VAR_DECL: DECL_TLS_MODEL, VAR_DECL_IS_VIRTUAL_OPERAND
+- FUNCTION_DECL: DECL_NONSTATIC_MEMBER_P, DECL_CLONED_FUNCTION_P, DECL_BUILT_IN, DECL_VINDEX, DECL_IS_RETURNS_TWICE, DECL_IS_NOVOPS
