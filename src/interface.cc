@@ -22,46 +22,6 @@ namespace treecreeper {
     bool in_cxx;
 } // namespace treecreeper
 
-#if 0
-static const struct gimple_opt_pass traverse_pass = {
-    { GIMPLE_PASS,
-      "traverse_declarations",
-      0,
-      traverse_gate,
-      traverse_callback,
-      NULL,
-      NULL,
-      0,
-      TV_NONE,
-      PROP_gimple_any,
-      0,
-      0,
-      0,
-      0
-    }
-};
-
-static void
-register_callbacks (const char* plugin_name)
-{
-    // struct register_pass_info traverse_pass_info;
-
-    // traverse_pass_info.pass = traverse_pass.pass;
-    // traverse_pass_info.reference_pass_name = pass_warn_unused_result.pass.name;
-    // traverse_pass_info.ref_pass_instance_number = 0;
-    // traverse_pass_info.pos_op = PASS_POS_INSERT_BEFORE;
-
-    // register_callback (plugin_name, PLUGIN_PASS_MANAGER_SETUP, NULL,
-    //                    &traverse_pass_info);
-} // register_callbacks
-
-static bool
-traverse_gate ()
-{
-    return 0;
-} // traverse_gate
-#endif
-
 static void
 visitor_callback (void* t, void* phase)
 {
@@ -78,9 +38,10 @@ traverse_callback (void*, void* version)
 } // traverse_callback
 
 extern "C" int
-plugin_init (plugin_name_args* info,
+plugin_init (plugin_name_args* args,
              plugin_gcc_version* version)
 {
+    const char *base_name = args->base_name;
     // C++ functions declared with weak linkage in plugin.h will not be
     // available if we are called from the C frontend. If that is the case
     // enable restricted mode.
@@ -98,9 +59,9 @@ plugin_init (plugin_name_args* info,
 
     treecreeper::options.builtins = false;
 
-    for (int j = 0; j < info->argc; j++)
+    for (int j = 0; j < args->argc; j++)
         {
-            plugin_argument& arg = info->argv[j];
+            plugin_argument& arg = args->argv[j];
             if (!std::strcmp (arg.key, "output") && arg.value)
                 treecreeper::options.output_file = arg.value;
             else if (!std::strcmp (arg.key, "builtins")
@@ -112,31 +73,33 @@ plugin_init (plugin_name_args* info,
 
     if (treecreeper::options.output_file.empty ()) {
         std::cerr << "treecreeper: Output file not defined (use -fplugin-arg-"
-                  << info->base_name << "-output=file)\n";
+                  << args->base_name << "-output=file)\n";
         std::exit (1);
     } // if
 
     // Disable assembly output.
     asm_file_name = HOST_BIT_BUCKET;
 
-    register_callback (info->base_name,
+    plugin_info info = { TREECREEPER_VERSION, "Tree Creeper" };
+    register_callback (args->base_name, PLUGIN_INFO, NULL, &info);
+    register_callback (base_name,
                        PLUGIN_FINISH_UNIT,
                        traverse_callback,
                        version);
 
-    register_callback (info->base_name,
+    register_callback (base_name,
                        PLUGIN_PRE_GENERICIZE,
                        visitor_callback,
                        (void*) "PRE_GENERICIZE");
 
-    register_callback (info->base_name,
+    register_callback (base_name,
                        PLUGIN_FINISH_DECL,
                        visitor_callback,
                        (void*) "FINISH_DECL");
 
-    register_callback (info->base_name,
+    register_callback (base_name,
                        PLUGIN_FINISH_TYPE,
                        visitor_callback,
                        (void*) "FINISH_TYPE");
-return 0;
+    return 0;
 } // plugin_init

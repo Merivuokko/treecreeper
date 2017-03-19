@@ -1,3 +1,7 @@
+# Configuration section
+
+# Edit the following variables to fit your system configuration
+
 DEBUG := 1
 
 HOST_GXX := g++
@@ -10,6 +14,11 @@ ifeq "$(DEBUG)" "1"
 else
     TARGET_GCC := gcc
 endif
+
+# End of configuration
+
+TREECREEPER_VERSION := 0.1
+CXXFLAGS += -DTREECREEPER_VERSION=\"$(TREECREEPER_VERSION)\"
 
 CXXINCLUDES := -I$(shell $(TARGET_GCC) -print-file-name=plugin)/include
 
